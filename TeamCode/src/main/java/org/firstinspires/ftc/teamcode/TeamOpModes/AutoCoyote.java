@@ -117,5 +117,11 @@ public class AutoCoyote extends LinearOpMode {
                 .strafeToSplineHeading(new Vector2d(48,48), Math.toRadians(45));
         TrajectoryActionBuilder traj3 = traj2.fresh()
                 .strafeToSplineHeading(new Vector2d(48,36), Math.toRadians(-90));
+        Actions.runBlocking(
+                new SequentialAction(
+                        traj1;
+                        closeClaw();
+                )
+        );
     }
 }
