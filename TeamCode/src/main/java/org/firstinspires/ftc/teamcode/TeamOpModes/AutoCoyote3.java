@@ -17,15 +17,15 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
 @Config
-@Autonomous(name = "HALF_AUTO_RIGHT", group = "Autonomous")
-public class AutoCoyote extends LinearOpMode {
+@Autonomous(name = "HALF_AUTO_LEFT", group = "Autonomous")
+public class AutoCoyote3 extends LinearOpMode {
     public void runOpMode() {
 
 
         DcMotorEx lift = hardwareMap.get(DcMotorEx.class, "lift");
 
 
-        Pose2d initialPose = new Pose2d(-24, 60, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(24, 61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         DependencyOp.Claw claw = new DependencyOp.Claw(hardwareMap);
@@ -40,16 +40,16 @@ public class AutoCoyote extends LinearOpMode {
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(-36, 36), Math.toRadians(-90))
-                .strafeTo(new Vector2d(-36, 12))
-                .splineToConstantHeading(new Vector2d(-46, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-46, 54))
-                .strafeTo(new Vector2d(-46, 12))
-                .splineToConstantHeading(new Vector2d(-56, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-56, 54))
-                .strafeTo(new Vector2d(-56, 12))
-                .splineToConstantHeading(new Vector2d(-64, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-64, 54));
+                .splineToConstantHeading(new Vector2d(36, 36), Math.toRadians(-90))
+                .strafeTo(new Vector2d(36, 12))
+                .splineToConstantHeading(new Vector2d(46, 12), Math.toRadians(90))
+                .strafeTo(new Vector2d(46, 54))
+                .strafeTo(new Vector2d(46, 12))
+                .splineToConstantHeading(new Vector2d(56, 12), Math.toRadians(90))
+                .strafeTo(new Vector2d(56, 54))
+                .strafeTo(new Vector2d(56, 12))
+                .splineToConstantHeading(new Vector2d(62, 12), Math.toRadians(90))
+                .strafeTo(new Vector2d(62, 54));
 
         Action Traj1;
         Action Traj2;
