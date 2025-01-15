@@ -94,7 +94,7 @@ public class DependencyOp {
 
                 double pos = arm.getCurrentPosition();
                 packet.put("armPos", pos);
-                if (pos > -2391) {
+                if (pos > -1800) {
                     return true;
                 } else {
                     arm.setPower(0);

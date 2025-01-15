@@ -81,7 +81,7 @@ public class TeleOpTest extends LinearOpMode {
                 worm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 worm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             }
-            if (arm.getCurrentPosition() < -2391) {
+            if (arm.getCurrentPosition() < -2700) {
                 arm.setPower(java.lang.Math.max(0, gamepad2.left_stick_y));
                 telemetry.addData("Arm Overextended?", "true");
             } else {

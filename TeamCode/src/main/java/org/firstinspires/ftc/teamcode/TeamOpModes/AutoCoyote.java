@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.TeamOpModes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -13,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
@@ -22,15 +25,18 @@ public class AutoCoyote extends LinearOpMode {
     public void runOpMode() {
 
 
-        DcMotorEx lift = hardwareMap.get(DcMotorEx.class, "lift");
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
 
 
-        Pose2d initialPose = new Pose2d(-24, 60, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(-24, 63, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+
 
         DependencyOp.Claw claw = new DependencyOp.Claw(hardwareMap);
         DependencyOp.Arm arm = new DependencyOp.Arm(hardwareMap);
         DependencyOp.Worm worm = new DependencyOp.Worm(hardwareMap);
+
 
         TrajectoryActionBuilder traj1 = drive.actionBuilder(initialPose)
                 .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0));
@@ -41,44 +47,41 @@ public class AutoCoyote extends LinearOpMode {
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(-36, 36), Math.toRadians(-90))
-                .strafeTo(new Vector2d(-36, 12))
+                .splineToConstantHeading(new Vector2d(-36, 12), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-46, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-46, 54))
-                .strafeTo(new Vector2d(-46, 12))
+
+                .splineToConstantHeading(new Vector2d(-46, 56), Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(-46, 12), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-56, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-56, 54))
-                .strafeTo(new Vector2d(-56, 12))
-                .splineToConstantHeading(new Vector2d(-64, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(-64, 54));
+
+                .splineToConstantHeading(new Vector2d(-56, 54), Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(-56, 12), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(-61, 12), Math.toRadians(90))
+
+                .splineToConstantHeading(new Vector2d(-61, 54), Math.toRadians(90));
+
 
         Action Traj1;
         Action Traj2;
         Action Traj3;
+
 
         Traj1 = traj1.build();
         Traj2 = traj2.build();
         Traj3 = traj3.build();
 
 
-        Actions.runBlocking(claw.closeClaw());
-
-
-        lift.setPower(0.7);
-
-
-        while (true && !isStopRequested()) {
-            if (lift.getCurrent(CurrentUnit.AMPS) > 3) {
-                lift.setPower(0);
-                break;
-            }
+        while (opModeInInit()) {
+            Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
+            FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
-
-
-        waitForStart();
 
 
         Actions.runBlocking(
                 new SequentialAction(
+                        claw.closeClaw(),
                         new ParallelAction(
                                 Traj1,
                                 worm.wormUp(),
@@ -86,6 +89,7 @@ public class AutoCoyote extends LinearOpMode {
                         ),
                         Traj2,
                         arm.armDown(),
+                        claw.openClaw(),
                         new ParallelAction(
                                 Traj3,
                                 worm.wormDown()

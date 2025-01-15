@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -17,15 +18,12 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
 @Config
-@Autonomous(name = "HALF_AUTO_LEFT_TEST", group = "Autonomous")
+@Autonomous(name = "HALF_AUTO_LEFT", group = "Autonomous")
 public class AutoCoyote2 extends LinearOpMode {
     public void runOpMode() {
 
 
-        DcMotorEx lift = hardwareMap.get(DcMotorEx.class, "lift");
-
-
-        Pose2d initialPose = new Pose2d(24, 61, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(24, 63, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         DependencyOp.Claw claw = new DependencyOp.Claw(hardwareMap);
@@ -36,20 +34,25 @@ public class AutoCoyote2 extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0));
 
         TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(0, 30));
+                .strafeTo(new Vector2d(0, 29));
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(36, 36), Math.toRadians(-90))
-                .strafeTo(new Vector2d(36, 12))
+                .splineToLinearHeading(new Pose2d(36, 36, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(36, 12), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(46, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(46, 54))
-                .strafeTo(new Vector2d(46, 12))
+
+                .splineToConstantHeading(new Vector2d(46, 56), Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(46, 12), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(56, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(56, 54))
-                .strafeTo(new Vector2d(56, 12))
-                .splineToConstantHeading(new Vector2d(62, 12), Math.toRadians(90))
-                .strafeTo(new Vector2d(62, 54));
+
+                .splineToConstantHeading(new Vector2d(56, 54), Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(56, 12), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(61, 12), Math.toRadians(90))
+
+                .splineToConstantHeading(new Vector2d(61, 54), Math.toRadians(90));
 
         Action Traj1;
         Action Traj2;
@@ -60,25 +63,13 @@ public class AutoCoyote2 extends LinearOpMode {
         Traj3 = traj3.build();
 
 
-        Actions.runBlocking(claw.closeClaw());
-
-
-        lift.setPower(0.7);
-
-
-        while (true && !isStopRequested()) {
-            if (lift.getCurrent(CurrentUnit.AMPS) > 3) {
-                lift.setPower(0);
-                break;
-            }
-        }
-
-
         waitForStart();
 
 
         Actions.runBlocking(
                 new SequentialAction(
+                        new SleepAction(5),
+                        claw.closeClaw(),
                         new ParallelAction(
                                 Traj1,
                                 worm.wormUp(),
@@ -86,6 +77,7 @@ public class AutoCoyote2 extends LinearOpMode {
                         ),
                         Traj2,
                         arm.armDown(),
+                        claw.openClaw(),
                         new ParallelAction(
                                 Traj3,
                                 worm.wormDown()
