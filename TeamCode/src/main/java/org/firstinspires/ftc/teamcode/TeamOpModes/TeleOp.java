@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -36,6 +35,10 @@ public class TeleOp extends LinearOpMode {
         claw = hardwareMap.get(Servo.class, "claw");
         DependencyOp.Worm Worm = new DependencyOp.Worm(hardwareMap);
         DependencyOp.Arm Arm = new DependencyOp.Arm(hardwareMap);
+        arm.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        worm.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        arm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        worm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm.setDirection(DcMotorEx.Direction.FORWARD);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
         worm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
