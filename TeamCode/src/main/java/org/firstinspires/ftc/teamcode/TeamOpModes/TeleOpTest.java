@@ -24,11 +24,18 @@ public class TeleOpTest extends LinearOpMode {
     private DcMotorEx arm;
     private DcMotor lift;
     private Servo claw;
+
+    double px = -18;
+    double py = 111;
+    double rx;
+    double ry;
+    double head;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Pose2d initialPose = new Pose2d(-24, 60, Math.toRadians(-90));
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-24, 60, Math.toRadians(-90)));
+        Pose2d initialPose = new Pose2d(-24, 60, Math.toRadians(90));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         worm = hardwareMap.get(DcMotorEx.class, "worm");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         lift = hardwareMap.get(DcMotor.class, "lift");
@@ -55,22 +62,16 @@ public class TeleOpTest extends LinearOpMode {
             }
             drive.updatePoseEstimate();
             drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(
-                            ((-gamepad1.left_stick_y * java.lang.Math.cos(drive.pose.heading.toDouble()))
-                                    - (gamepad1.left_stick_x * java.lang.Math.sin(drive.pose.heading.toDouble()))),
-                            ((gamepad1.left_stick_y * java.lang.Math.sin(drive.pose.heading.toDouble()))
-                                    - (gamepad1.left_stick_x * java.lang.Math.cos(drive.pose.heading.toDouble())))
-                    ),
-                    -gamepad1.right_stick_x
+                    DriveVector(px, py, drive.pose.position.x, -drive.pose.position.y, drive.pose.heading.toDouble()),
+                    gamepad1.right_stick_x
             ));
-            if (gamepad2.a) {
+            if (gamepad2.a && (worm.getCurrentPosition() < 5000)) {
                 worm.setPower(1);
             } else if (gamepad2.b) {
                 worm.setPower(-1);
             } else {
                 worm.setPower(0);
             }
-            drive.updatePoseEstimate();
             if (gamepad2.y) {
                 arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -81,12 +82,18 @@ public class TeleOpTest extends LinearOpMode {
                 worm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 worm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             }
-            if (arm.getCurrentPosition() < -2700) {
-                arm.setPower(java.lang.Math.max(0, gamepad2.left_stick_y));
-                telemetry.addData("Arm Overextended?", "true");
+            if (worm.getCurrentPosition() > 3000) {
+                if (arm.getCurrentPosition() < -3900) {
+                    arm.setPower(java.lang.Math.max(0, gamepad2.left_stick_y));
+                } else {
+                    arm.setPower(gamepad2.left_stick_y);
+                }
             } else {
-                arm.setPower(gamepad2.left_stick_y);
-                telemetry.addData("Arm Overextended?", "false");
+                if (arm.getCurrentPosition() < -2170) {
+                    arm.setPower(java.lang.Math.max(0, gamepad2.left_stick_y));
+                } else {
+                    arm.setPower(gamepad2.left_stick_y);
+                }
             }
             if (gamepad2.dpad_left) {
                 Actions.runBlocking(Worm.wormDown());
@@ -100,7 +107,7 @@ public class TeleOpTest extends LinearOpMode {
             if (gamepad2.dpad_down) {
                 Actions.runBlocking(Arm.armDown());
             }
-            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger, gamepad2.left_trigger));
+            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 2, gamepad2.left_trigger / 2));
             lift.setPower(gamepad2.right_stick_y);
             double armcurrent = arm.getCurrent(CurrentUnit.AMPS);
             double wormcurrent = worm.getCurrent(CurrentUnit.AMPS);
@@ -108,14 +115,24 @@ public class TeleOpTest extends LinearOpMode {
             packet.fieldOverlay().setStroke("#3F51B5");
             Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
-            arm.setCurrentAlert(7, CurrentUnit.AMPS);
-            worm.setCurrentAlert(5, CurrentUnit.AMPS);
             telemetry.addData("Worm Current Draw: ", wormcurrent);
             telemetry.addData("Arm Current Draw: ", armcurrent);
             telemetry.addData("Worm Pos", worm.getCurrentPosition());
             telemetry.addData("Arm Pos", arm.getCurrentPosition());
-            telemetry.addData("Heading: ", Math.toRadians(drive.pose.heading.toDouble()));
+            telemetry.addData("Heading: ", Math.toDegrees(drive.pose.heading.toDouble()));
             telemetry.update();
         }
+    }
+    public <px, py, rx, ry, head> Vector2d DriveVector(double Px, double Py, double Rx, double Ry, double Head) {
+        double deltX = rx - px;
+        double deltY = ry - py;
+        double lookAng = Math.atan2(deltY, deltX);
+        telemetry.addData("lookAng", lookAng);
+        return new Vector2d(
+                ((gamepad1.left_stick_y * java.lang.Math.sin(head - lookAng))
+                        - (gamepad1.left_stick_x * java.lang.Math.cos(head - lookAng))) / 1.5,
+                ((gamepad1.left_stick_y * java.lang.Math.cos(head - lookAng))
+                        + (gamepad1.left_stick_x * java.lang.Math.sin(head - lookAng))) / 1.5
+        );
     }
 }
