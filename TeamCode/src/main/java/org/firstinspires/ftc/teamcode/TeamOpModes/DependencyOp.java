@@ -69,6 +69,30 @@ public class DependencyOp {
         public Action wormDown() {
             return new WormDown();
         }
+        public class WormDownSample implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    worm.setPower(-1);
+                    initialized = true;
+                }
+
+                double pos = worm.getCurrentPosition();
+                packet.put("liftPos", pos);
+                if (pos > -150) {
+                    return true;
+                } else {
+                    worm.setPower(0);
+                    return false;
+                }
+            }
+        }
+        public Action wormDownSample() {
+            return new WormDownSample();
+        }
     }
 
     public static class Arm {
