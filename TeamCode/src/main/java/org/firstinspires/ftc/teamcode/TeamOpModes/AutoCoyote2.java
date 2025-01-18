@@ -20,10 +20,31 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 @Autonomous(name = "HALF_AUTO_LEFT", group = "Autonomous")
 public class AutoCoyote2 extends LinearOpMode {
+
+    private boolean prevup = false;
+    private boolean prevdown = false;
+    private double t = 0;
     public void runOpMode() {
 
 
-        Pose2d initialPose = new Pose2d(24, 63, Math.toRadians(-90));
+        while (!gamepad1.y && !opModeIsActive()) {
+
+            if (gamepad1.dpad_down && !prevdown && (t > 0)) {
+                t += -1;
+            }
+
+            if (gamepad1.dpad_up && !prevup) {
+                t += 1;
+            }
+
+            prevup = gamepad1.dpad_up;
+            prevdown = gamepad1.dpad_down;
+            telemetry.addData("Timer", t);
+            telemetry.update();
+        }
+
+
+        Pose2d initialPose = new Pose2d(24, 62, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         DependencyOp.Claw claw = new DependencyOp.Claw(hardwareMap);
@@ -34,7 +55,7 @@ public class AutoCoyote2 extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0));
 
         TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(0, 29));
+                .strafeTo(new Vector2d(0, 30));
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
@@ -68,7 +89,7 @@ public class AutoCoyote2 extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        new SleepAction(5),
+                        new SleepAction(t),
                         claw.closeClaw(),
                         new ParallelAction(
                                 Traj1,

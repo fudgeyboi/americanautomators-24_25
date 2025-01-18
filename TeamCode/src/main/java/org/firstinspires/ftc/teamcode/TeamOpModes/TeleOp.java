@@ -105,7 +105,7 @@ public class TeleOp extends LinearOpMode {
             if (gamepad2.dpad_down) {
                 Actions.runBlocking(Arm.armDown());
             }
-            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 2, gamepad2.left_trigger / 2));
+            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 4, gamepad2.left_trigger / 4));
             lift.setPower(gamepad2.right_stick_y);
             double armcurrent = arm.getCurrent(CurrentUnit.AMPS);
             double wormcurrent = worm.getCurrent(CurrentUnit.AMPS);

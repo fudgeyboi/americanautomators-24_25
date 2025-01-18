@@ -18,7 +18,30 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 @Autonomous(name = "HALF_AUTO_LEFT_TEST", group = "Autonomous")
 public class AutoCoyote3 extends LinearOpMode {
+
+    private boolean prevup = false;
+    private boolean prevdown = false;
+    private double t = 0;
+
+
     public void runOpMode() {
+
+
+        while (!gamepad1.y && !opModeIsActive()) {
+
+            if (gamepad1.dpad_down && !prevdown && (t > 0)) {
+                t += -1;
+            }
+
+            if (gamepad1.dpad_up && !prevup) {
+                t += 1;
+            }
+
+            prevup = gamepad1.dpad_up;
+            prevdown = gamepad1.dpad_down;
+            telemetry.addData("Timer", t);
+            telemetry.update();
+        }
 
 
         Pose2d initialPose = new Pose2d(24, 63, Math.toRadians(-90));
@@ -36,11 +59,11 @@ public class AutoCoyote3 extends LinearOpMode {
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(42.5,51), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(42.5,47), Math.toRadians(-90));
 
         TrajectoryActionBuilder traj4 = traj3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(42.5,51), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(48,48), Math.toRadians(45));
 
         Action Traj1;
         Action Traj2;
@@ -58,7 +81,7 @@ public class AutoCoyote3 extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        new SleepAction(5),
+                        new SleepAction(t),
                         claw.closeClaw(),
                         new ParallelAction(
                                 Traj1,
@@ -70,8 +93,14 @@ public class AutoCoyote3 extends LinearOpMode {
                         claw.openClaw(),
                         new ParallelAction(
                                 Traj3,
-                                worm.wormDownSample()
-                        )
+                                worm.wormDownSample(),
+                                arm.armGrabSample()
+                        ),
+                        claw.closeClaw(),
+                        new SleepAction(1),
+                        worm.wormUp(),
+                        arm.armDropSample(),
+                        Traj4
                 )
         );
     }

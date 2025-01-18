@@ -153,6 +153,56 @@ public class DependencyOp {
         public Action armDown() {
             return new ArmDown();
         }
+
+        public class ArmGrabSample implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    arm.setPower(-1);
+                    initialized = true;
+                }
+
+                double pos = arm.getCurrentPosition();
+                packet.put("armPos", pos);
+                if (pos > -1000) {
+                    return true;
+                } else {
+                    arm.setPower(0);
+                    return false;
+                }
+            }
+        }
+        public Action armGrabSample() {
+            return new ArmGrabSample();
+        }
+
+        public class ArmDropSample implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    arm.setPower(-1);
+                    initialized = true;
+                }
+
+                double pos = arm.getCurrentPosition();
+                packet.put("armPos", pos);
+                if (pos > -3900) {
+                    return true;
+                } else {
+                    arm.setPower(0);
+                    return false;
+                }
+            }
+        }
+        public Action armDropSample() {
+            return new ArmDropSample();
+        }
     }
     public static class Claw {
         private Servo claw;
@@ -173,7 +223,7 @@ public class DependencyOp {
         public class OpenClaw implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                claw.setPosition(1);
+                claw.setPosition(0.25);
                 return false;
             }
         }

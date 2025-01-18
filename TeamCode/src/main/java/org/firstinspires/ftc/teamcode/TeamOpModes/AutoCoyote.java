@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -22,14 +23,36 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 @Autonomous(name = "HALF_AUTO_RIGHT", group = "Autonomous")
 public class AutoCoyote extends LinearOpMode {
+
+    private boolean prevup = false;
+    private boolean prevdown = false;
+    private double t = 0;
+
     public void runOpMode() {
+
+
+        while (!gamepad1.y && !opModeIsActive()) {
+
+            if (gamepad1.dpad_down && !prevdown && (t > 0)) {
+                t += -1;
+            }
+
+            if (gamepad1.dpad_up && !prevup) {
+                t += 1;
+            }
+
+            prevup = gamepad1.dpad_up;
+            prevdown = gamepad1.dpad_down;
+            telemetry.addData("Timer", t);
+            telemetry.update();
+        }
 
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().setStroke("#3F51B5");
 
 
-        Pose2d initialPose = new Pose2d(-24, 63, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(-24, 62, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -46,7 +69,7 @@ public class AutoCoyote extends LinearOpMode {
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(-36, 36), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-36, 36, Math.toRadians(90)), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-36, 12), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-46, 12), Math.toRadians(90))
 
@@ -81,6 +104,7 @@ public class AutoCoyote extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
+                        new SleepAction(t),
                         claw.closeClaw(),
                         new ParallelAction(
                                 Traj1,
