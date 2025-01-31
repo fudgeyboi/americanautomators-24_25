@@ -31,7 +31,7 @@ public class AutoCoyote extends LinearOpMode {
     public void runOpMode() {
 
 
-        while (!gamepad1.y && !opModeIsActive()) {
+        while (!gamepad1.y && !opModeIsActive() && !isStopRequested()) {
 
             if (gamepad1.dpad_down && !prevdown && (t > 0)) {
                 t += -1;
@@ -60,14 +60,11 @@ public class AutoCoyote extends LinearOpMode {
         DependencyOp.Arm arm = new DependencyOp.Arm(hardwareMap);
         DependencyOp.Worm worm = new DependencyOp.Worm(hardwareMap);
 
-
         TrajectoryActionBuilder traj1 = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0));
-
-        TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
+                .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0))
                 .strafeTo(new Vector2d(0, 30));
 
-        TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
+        TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
                 .splineToLinearHeading(new Pose2d(-36, 36, Math.toRadians(90)), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-36, 12), Math.toRadians(-90))
@@ -81,25 +78,20 @@ public class AutoCoyote extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(-56, 54), Math.toRadians(90))
                 .setTangent(Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(-56, 12), Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(-61, 12), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(-65, 12), Math.toRadians(90))
 
-                .splineToConstantHeading(new Vector2d(-61, 54), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(-65, 54), Math.toRadians(90));
 
 
         Action Traj1;
         Action Traj2;
-        Action Traj3;
 
 
         Traj1 = traj1.build();
         Traj2 = traj2.build();
-        Traj3 = traj3.build();
 
 
-        while (opModeInInit()) {
-            Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
-        }
+        waitForStart();
 
 
         Actions.runBlocking(
@@ -111,11 +103,9 @@ public class AutoCoyote extends LinearOpMode {
                                 worm.wormUp(),
                                 arm.armUp()
                         ),
-                        Traj2,
                         arm.armDown(),
-                        claw.openClaw(),
                         new ParallelAction(
-                                Traj3,
+                                Traj2,
                                 worm.wormDown()
                         )
                 )

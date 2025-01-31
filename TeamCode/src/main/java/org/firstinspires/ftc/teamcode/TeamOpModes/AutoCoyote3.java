@@ -27,7 +27,7 @@ public class AutoCoyote3 extends LinearOpMode {
     public void runOpMode() {
 
 
-        while (!gamepad1.y && !opModeIsActive()) {
+        while (!gamepad1.y && !opModeIsActive() && !isStopRequested()) {
 
             if (gamepad1.dpad_down && !prevdown && (t > 0)) {
                 t += -1;
@@ -44,7 +44,7 @@ public class AutoCoyote3 extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(24, 63, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(24, 59, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         DependencyOp.Claw claw = new DependencyOp.Claw(hardwareMap);
@@ -52,28 +52,46 @@ public class AutoCoyote3 extends LinearOpMode {
         DependencyOp.Worm worm = new DependencyOp.Worm(hardwareMap);
 
         TrajectoryActionBuilder traj1 = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(0,54), Math.toRadians(0));
+                .splineToConstantHeading(new Vector2d(0, 54), Math.toRadians(180));
 
         TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(0, 29));
+                .strafeTo(new Vector2d(0, 27));
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(42.5,47), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(45, 40), Math.toRadians(-90));
 
         TrajectoryActionBuilder traj4 = traj3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48,48), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(52, 49, Math.toRadians(45)), Math.toRadians(45));
+
+        TrajectoryActionBuilder traj5 = traj4.endTrajectory().fresh()
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(56, 40, Math.toRadians(-90)), Math.toRadians(-90));
+
+        TrajectoryActionBuilder traj6 = traj5.endTrajectory().fresh()
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(52, 49, Math.toRadians(45)), Math.toRadians(45));
+
+        TrajectoryActionBuilder traj7 = traj6.endTrajectory().fresh()
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(24, 48, Math.toRadians(90)), Math.toRadians(0));
 
         Action Traj1;
         Action Traj2;
         Action Traj3;
         Action Traj4;
+        Action Traj5;
+        Action Traj6;
+        Action Traj7;
 
         Traj1 = traj1.build();
         Traj2 = traj2.build();
         Traj3 = traj3.build();
         Traj4 = traj4.build();
+        Traj5 = traj5.build();
+        Traj6 = traj6.build();
+        Traj7 = traj7.build();
 
 
         waitForStart();
@@ -100,7 +118,23 @@ public class AutoCoyote3 extends LinearOpMode {
                         new SleepAction(1),
                         worm.wormUp(),
                         arm.armDropSample(),
-                        Traj4
+                        Traj4,
+                        claw.openClaw(),
+                        new SleepAction(1),
+                        Traj5,
+                        new ParallelAction(
+                                arm.armGrabSample(),
+                                worm.wormDownSample()
+                        ),
+                        claw.closeClaw(),
+                        new SleepAction(1),
+                        worm.wormUp(),
+                        arm.armDropSample(),
+                        Traj6,
+                        claw.openClaw(),
+                        new SleepAction(1),
+                        Traj7,
+                        arm.armDown()
                 )
         );
     }

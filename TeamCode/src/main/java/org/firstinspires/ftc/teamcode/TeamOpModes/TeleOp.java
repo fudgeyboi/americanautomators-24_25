@@ -24,6 +24,7 @@ public class TeleOp extends LinearOpMode {
     private DcMotorEx arm;
     private DcMotor lift;
     private Servo claw;
+    private Servo sweeper;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -33,18 +34,13 @@ public class TeleOp extends LinearOpMode {
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         lift = hardwareMap.get(DcMotor.class, "lift");
         claw = hardwareMap.get(Servo.class, "claw");
+        sweeper = hardwareMap.get(Servo.class, "sweeper");
         DependencyOp.Worm Worm = new DependencyOp.Worm(hardwareMap);
         DependencyOp.Arm Arm = new DependencyOp.Arm(hardwareMap);
         arm.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         worm.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        arm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        worm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm.setDirection(DcMotorEx.Direction.FORWARD);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
-        worm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        worm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         worm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -93,6 +89,7 @@ public class TeleOp extends LinearOpMode {
                     arm.setPower(gamepad2.left_stick_y);
                 }
             }
+            sweeper.setPosition(gamepad1.right_trigger);
             if (gamepad2.dpad_left) {
                 Actions.runBlocking(Worm.wormDown());
             }
@@ -105,7 +102,7 @@ public class TeleOp extends LinearOpMode {
             if (gamepad2.dpad_down) {
                 Actions.runBlocking(Arm.armDown());
             }
-            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 4, gamepad2.left_trigger / 4));
+            claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 5, gamepad2.left_trigger / 5));
             lift.setPower(gamepad2.right_stick_y);
             double armcurrent = arm.getCurrent(CurrentUnit.AMPS);
             double wormcurrent = worm.getCurrent(CurrentUnit.AMPS);

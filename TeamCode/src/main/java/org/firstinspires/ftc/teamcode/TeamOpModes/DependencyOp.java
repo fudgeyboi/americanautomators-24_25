@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
 @Config
 public class DependencyOp {
     public static class Worm {
@@ -34,7 +32,7 @@ public class DependencyOp {
                 }
                 double pos = worm.getCurrentPosition();
                 packet.put("wormpos", pos);
-                if (pos < 3200) {
+                if (pos < 3400) {
                     return true;
                 } else {
                     worm.setPower(0);
@@ -82,7 +80,7 @@ public class DependencyOp {
 
                 double pos = worm.getCurrentPosition();
                 packet.put("liftPos", pos);
-                if (pos > -150) {
+                if (pos > -400) {
                     return true;
                 } else {
                     worm.setPower(0);
@@ -160,14 +158,20 @@ public class DependencyOp {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
+
+
+                double pos = arm.getCurrentPosition();
+
                 if (!initialized) {
-                    arm.setPower(-1);
+                    arm.setPower(-java.lang.Math.signum(pos + 1050));
                     initialized = true;
                 }
 
-                double pos = arm.getCurrentPosition();
+
                 packet.put("armPos", pos);
-                if (pos > -1000) {
+
+
+                if ((pos > -1000) || (pos < -1100)) {
                     return true;
                 } else {
                     arm.setPower(0);
