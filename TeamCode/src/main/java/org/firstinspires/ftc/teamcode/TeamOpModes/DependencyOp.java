@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -17,7 +18,6 @@ public class DependencyOp {
 
         public Worm(HardwareMap hardwareMap) {
             worm = hardwareMap.get(DcMotorEx.class, "worm");
-            worm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             worm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             worm.setDirection(DcMotorEx.Direction.FORWARD);
         }
@@ -27,15 +27,17 @@ public class DependencyOp {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    worm.setPower(1);
+                    worm.setPower(0.7);
                     initialized = true;
                 }
                 double pos = worm.getCurrentPosition();
                 packet.put("wormpos", pos);
+                new SleepAction(0.01);
                 if (pos < 3400) {
                     return true;
                 } else {
                     worm.setPower(0);
+                    new SleepAction(0.2);
                     return false;
                 }
             }
@@ -50,16 +52,18 @@ public class DependencyOp {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    worm.setPower(-1);
+                    worm.setPower(-0.7);
                     initialized = true;
                 }
 
                 double pos = worm.getCurrentPosition();
-                packet.put("liftPos", pos);
+                packet.put("wormpos", pos);
+                new SleepAction(0.1);
                 if (pos > 50) {
                     return true;
                 } else {
                     worm.setPower(0);
+                    new SleepAction(0.2);
                     return false;
                 }
             }
@@ -74,16 +78,18 @@ public class DependencyOp {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    worm.setPower(-1);
+                    worm.setPower(-0.7);
                     initialized = true;
                 }
 
                 double pos = worm.getCurrentPosition();
-                packet.put("liftPos", pos);
+                packet.put("wormpos", pos);
+                new SleepAction(0.1);
                 if (pos > -400) {
                     return true;
                 } else {
                     worm.setPower(0);
+                    new SleepAction(0.2);
                     return false;
                 }
             }
@@ -116,7 +122,7 @@ public class DependencyOp {
 
                 double pos = arm.getCurrentPosition();
                 packet.put("armPos", pos);
-                if (pos > -1800) {
+                if (pos > -1700) {
                     return true;
                 } else {
                     arm.setPower(0);
@@ -163,7 +169,7 @@ public class DependencyOp {
                 double pos = arm.getCurrentPosition();
 
                 if (!initialized) {
-                    arm.setPower(-java.lang.Math.signum(pos + 1050));
+                    arm.setPower(-java.lang.Math.signum(pos + 1075));
                     initialized = true;
                 }
 
@@ -171,7 +177,7 @@ public class DependencyOp {
                 packet.put("armPos", pos);
 
 
-                if ((pos > -1000) || (pos < -1100)) {
+                if ((pos > -1150) || (pos < -1200)) {
                     return true;
                 } else {
                     arm.setPower(0);

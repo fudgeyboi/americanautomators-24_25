@@ -59,19 +59,19 @@ public class AutoCoyote3 extends LinearOpMode {
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(45, 40), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(45, 41), Math.toRadians(-90));
 
         TrajectoryActionBuilder traj4 = traj3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(52, 49, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(51, 47, Math.toRadians(45)), Math.toRadians(45));
 
         TrajectoryActionBuilder traj5 = traj4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(56, 40, Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(51, 39, Math.toRadians(-90)), Math.toRadians(-90));
 
         TrajectoryActionBuilder traj6 = traj5.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(52, 49, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(51, 47, Math.toRadians(45)), Math.toRadians(45));
 
         TrajectoryActionBuilder traj7 = traj6.endTrajectory().fresh()
                 .setTangent(Math.toRadians(180))
@@ -106,6 +106,7 @@ public class AutoCoyote3 extends LinearOpMode {
                                 worm.wormUp(),
                                 arm.armUp()
                         ),
+                        new SleepAction(0.1),
                         Traj2,
                         arm.armDown(),
                         claw.openClaw(),
@@ -114,25 +115,29 @@ public class AutoCoyote3 extends LinearOpMode {
                                 worm.wormDownSample(),
                                 arm.armGrabSample()
                         ),
+                        new SleepAction(0.1),
                         claw.closeClaw(),
-                        new SleepAction(1),
+                        new SleepAction(0.2),
                         worm.wormUp(),
+                        new SleepAction(0.1),
                         arm.armDropSample(),
                         Traj4,
                         claw.openClaw(),
-                        new SleepAction(1),
+                        new SleepAction(0.2),
                         Traj5,
                         new ParallelAction(
                                 arm.armGrabSample(),
                                 worm.wormDownSample()
                         ),
+                        new SleepAction(0.1),
                         claw.closeClaw(),
-                        new SleepAction(1),
+                        new SleepAction(0.2),
                         worm.wormUp(),
+                        new SleepAction(0.1),
                         arm.armDropSample(),
                         Traj6,
                         claw.openClaw(),
-                        new SleepAction(1),
+                        new SleepAction(0.2),
                         Traj7,
                         arm.armDown()
                 )
