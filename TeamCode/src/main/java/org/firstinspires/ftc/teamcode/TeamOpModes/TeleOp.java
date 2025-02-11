@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.TeamOpModes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -28,7 +30,7 @@ public class TeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Pose2d initialPose = new Pose2d(-24, 60, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(24, 48, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         worm = hardwareMap.get(DcMotorEx.class, "worm");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
@@ -102,6 +104,14 @@ public class TeleOp extends LinearOpMode {
             if (gamepad2.dpad_down) {
                 Actions.runBlocking(Arm.armDown());
             }
+            if (gamepad1.y) {
+                TrajectoryActionBuilder traj1 = drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(51, 47), 45);
+
+                Action Traj1;
+                Traj1 = traj1.build();
+                Actions.runBlocking(Traj1);
+            }
             claw.setPosition(java.lang.Math.max(gamepad2.right_trigger / 5, gamepad2.left_trigger / 5));
             lift.setPower(gamepad2.right_stick_y);
             double armcurrent = arm.getCurrent(CurrentUnit.AMPS);
@@ -114,7 +124,9 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Arm Current Draw: ", armcurrent);
             telemetry.addData("Worm Pos", worm.getCurrentPosition());
             telemetry.addData("Arm Pos", arm.getCurrentPosition());
-            telemetry.addData("Heading: ", Math.toDegrees(drive.pose.heading.toDouble()));
+            telemetry.addData("x", drive.pose.position.x);
+            telemetry.addData("y", drive.pose.position.y);
+            telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
             telemetry.update();
         }
     }
