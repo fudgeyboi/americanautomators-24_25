@@ -55,27 +55,27 @@ public class AutoCoyote3 extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(0, 54), Math.toRadians(180));
 
         TrajectoryActionBuilder traj2 = traj1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(0, 27));
+                .strafeTo(new Vector2d(0, 26));
 
         TrajectoryActionBuilder traj3 = traj2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(45, 41), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(45, 40), Math.toRadians(-60));
 
         TrajectoryActionBuilder traj4 = traj3.endTrajectory().fresh()
-                .setTangent(Math.toRadians(90))
+                .setTangent(Math.toRadians(45))
                 .splineToLinearHeading(new Pose2d(51, 47, Math.toRadians(45)), Math.toRadians(45));
 
         TrajectoryActionBuilder traj5 = traj4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(51, 39, Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(52, 39, Math.toRadians(-90)), Math.toRadians(-90));
 
         TrajectoryActionBuilder traj6 = traj5.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(51, 47, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(51, 47, Math.toRadians(45)), Math.toRadians(90));
 
         TrajectoryActionBuilder traj7 = traj6.endTrajectory().fresh()
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(24, 48, Math.toRadians(90)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(24, 48, Math.toRadians(-90)), Math.toRadians(180));
 
         Action Traj1;
         Action Traj2;
@@ -112,7 +112,7 @@ public class AutoCoyote3 extends LinearOpMode {
                         claw.openClaw(),
                         new ParallelAction(
                                 Traj3,
-                                worm.wormDownSample(),
+                                worm.wormDown(),
                                 arm.armGrabSample()
                         ),
                         new SleepAction(0.1),
@@ -127,7 +127,7 @@ public class AutoCoyote3 extends LinearOpMode {
                         Traj5,
                         new ParallelAction(
                                 arm.armGrabSample(),
-                                worm.wormDownSample()
+                                worm.wormDown()
                         ),
                         new SleepAction(0.1),
                         claw.closeClaw(),

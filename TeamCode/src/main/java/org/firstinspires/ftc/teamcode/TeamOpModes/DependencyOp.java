@@ -27,13 +27,13 @@ public class DependencyOp {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    worm.setPower(0.7);
+                    worm.setPower(0.8);
                     initialized = true;
                 }
                 double pos = worm.getCurrentPosition();
                 packet.put("wormpos", pos);
                 new SleepAction(0.01);
-                if (pos < 3400) {
+                if (pos < 3800) {
                     return true;
                 } else {
                     worm.setPower(0);
@@ -52,14 +52,14 @@ public class DependencyOp {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    worm.setPower(-0.7);
+                    worm.setPower(-0.8);
                     initialized = true;
                 }
 
                 double pos = worm.getCurrentPosition();
                 packet.put("wormpos", pos);
                 new SleepAction(0.1);
-                if (pos > 50) {
+                if (pos > 25) {
                     return true;
                 } else {
                     worm.setPower(0);
@@ -70,32 +70,6 @@ public class DependencyOp {
         }
         public Action wormDown() {
             return new WormDown();
-        }
-        public class WormDownSample implements Action {
-
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    worm.setPower(-0.7);
-                    initialized = true;
-                }
-
-                double pos = worm.getCurrentPosition();
-                packet.put("wormpos", pos);
-                new SleepAction(0.1);
-                if (pos > -400) {
-                    return true;
-                } else {
-                    worm.setPower(0);
-                    new SleepAction(0.2);
-                    return false;
-                }
-            }
-        }
-        public Action wormDownSample() {
-            return new WormDownSample();
         }
     }
 
@@ -122,7 +96,7 @@ public class DependencyOp {
 
                 double pos = arm.getCurrentPosition();
                 packet.put("armPos", pos);
-                if (pos > -1700) {
+                if (pos > -1900) {
                     return true;
                 } else {
                     arm.setPower(0);
@@ -146,7 +120,7 @@ public class DependencyOp {
 
                 double pos = arm.getCurrentPosition();
                 packet.put("armPos", pos);
-                if (pos < -50) {
+                if (pos < -650) {
                     return true;
                 } else {
                     arm.setPower(0);
